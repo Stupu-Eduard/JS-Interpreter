@@ -1,0 +1,61 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\title{Proiectarea Semanticii Limbajului JavaScript-PLP}
+\author{Secțiunea C - Documentație Tehnică}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Modelul Semanticii Operaționale}
+Semantica limbajului este definită utilizând \textbf{Semantica Operațională Big-Step}. Deoarece în acest limbaj atribuirea este o expresie, evaluarea oricărei expresii poate modifica starea programului [cite: 730, 749-750].
+
+\subsection{Starea Programului (Environment)}
+Starea programului, notată cu $\sigma$, este o funcție care mapează identificatorii la valorile lor:
+$$\sigma \in \text{Env} = \text{Var} \to \text{Value} \cup \{\bot\}$$
+unde $\text{Value} = \{ \text{Int, Float, Bool, Char, String, Unit} \}$[cite: 729].
+
+\section{Semantica Expresiilor}
+Evaluarea unei expresii $e$ în starea $\sigma$ produce o valoare $v$ și o stare nouă $\sigma'$ (datorită posibilelor atribuiri):
+$$\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle$$
+
+\subsection{Reguli pentru Expresii}
+\begin{itemize}
+    \item \textbf{Constante:} $\langle c, \sigma \rangle \Downarrow \langle c, \sigma \rangle$
+    \item \textbf{Variabile:} $\frac{\sigma(x) = v}{\langle x, \sigma \rangle \Downarrow \langle v, \sigma \rangle}$
+    \item \textbf{Atribuire:} $\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle x = e, \sigma \rangle \Downarrow \langle v, \sigma'[x \leftarrow v] \rangle}$ (returnează valoarea și actualizează starea)[cite: 731, 750].
+    \item \textbf{Operații Binare:} $\frac{\langle e_1, \sigma \rangle \Downarrow \langle v_1, \sigma'' \rangle \quad \langle e_2, \sigma'' \rangle \Downarrow \langle v_2, \sigma' \rangle \quad v = v_1 \oplus v_2}{\langle e_1 \oplus e_2, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}$ \\
+    \textit{Notă: $e_2$ se evaluează în starea $\sigma''$ produsă de $e_1$.}[cite: 730].
+    \item \textbf{Operații Unare (NOT, Neg):} $\frac{\langle e, \sigma \rangle \Downarrow \langle v_1, \sigma' \rangle \quad v = \ominus v_1}{\langle \ominus e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}$ [cite: 764-765].
+\end{itemize}
+
+\section{Semantica Instrucțiunilor}
+Instrucțiunile transformă starea $\sigma$. Introducem o stare specială $Exit(v)$ pentru a gestiona instrucțiunea \texttt{return} [cite: 733-734].
+
+\subsection{Reguli de Control}
+\begin{itemize}
+    \item \textbf{Skip:} $\langle \text{;}, \sigma \rangle \to \sigma$[cite: 773].
+    \item \textbf{Declarație (Let):} $\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle \text{let } x = e, \sigma \rangle \to \sigma'[x \leftarrow v]}$ sau $\langle \text{let } x, \sigma \rangle \to \sigma[x \leftarrow \text{Unit}]$ [cite: 767-768].
+    \item \textbf{Secvențiere (Bloc):} $\frac{\langle s_1, \sigma \rangle \to \sigma'' \quad \sigma'' \text{ nu este } Exit \quad \langle s_2, \sigma'' \rangle \to \sigma'}{\langle \{s_1, s_2\}, \sigma \rangle \to \sigma'}$
+    \item \textbf{Condițional (If-Else):}
+    $$\frac{\langle e, \sigma \rangle \Downarrow \langle \text{true}, \sigma'' \rangle \quad \langle s_1, \sigma'' \rangle \to \sigma'}{\langle \text{if } (e) \text{ } s_1 \text{ else } s_2, \sigma \rangle \to \sigma'} \quad \frac{\langle e, \sigma \rangle \Downarrow \langle \text{false}, \sigma'' \rangle \quad \langle s_2, \sigma'' \rangle \to \sigma'}{\langle \text{if } (e) \text{ } s_1 \text{ else } s_2, \sigma \rangle \to \sigma'}$$[cite: 733, 770].
+    \item \textbf{Repetiție (While):}
+    $$\frac{\langle e, \sigma \rangle \Downarrow \langle \text{false}, \sigma' \rangle}{\langle \text{while } (e) \text{ } s, \sigma \rangle \to \sigma'} \quad \frac{\langle e, \sigma \rangle \Downarrow \langle \text{true}, \sigma'' \rangle \quad \langle s, \sigma'' \rangle \to \sigma''' \quad \langle \text{while } (e) \text{ } s, \sigma''' \rangle \to \sigma'}{\langle \text{while } (e) \text{ } s, \sigma \rangle \to \sigma'}$$[cite: 733, 772].
+\end{itemize}
+
+\section{Semantica Instrucțiunii Return}
+Instrucțiunea \texttt{return} oprește execuția imediată a blocului curent și propagă valoarea[cite: 734, 766]:
+$$\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle \text{return } e, \sigma \rangle \to Exit(v)}$$
+Dacă un bloc întâlnește o stare $Exit(v)$, toate instrucțiunile următoare sunt sărite.
+
+\section{Sistemul de Tipizare}
+Limbajul utilizează \textbf{Strong Typing la runtime}. Orice operație între tipuri incompatibile (ex: adunarea unui \texttt{Int} cu un \texttt{String}) va opri execuția cu o eroare de tip \texttt{RuntimeError}, fără a încerca conversia automată a valorilor[cite: 735].
+
+\end{document}
