@@ -705,3 +705,15 @@ while (pi_i <= 10) {
 
 // === FINAL ===
 // Toate variabilele sunt afisate in starea finala
+
+## EXTRA 
+## 1. Domenii de vizibilitate
+
+let x = 10;
+{
+    let y = 20;
+    x = x + y;
+    print(x);  // Ar trebui să fie 30
+}
+return y; // Aici ar trebui sa dea eroare
+return x;

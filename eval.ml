@@ -197,24 +197,32 @@ let rec exec_stmt (env :  env) (s : stmt) : result =
       let (v, env') = eval_expr env e in
       Exit (v, env')
 
-(* Execută un bloc de instrucțiuni secvențial *)
+(* Execută un bloc de instrucțiuni cu Scoping *)
 and exec_block env stmts =
-  match stmts with
-  | [] -> Continue env
-  | s :: rest ->
-      (match exec_stmt env s with
-       | Continue env' -> exec_block env' rest
-       | Exit (v, env') -> Exit (v, env'))  (* propagă return *)
+  let rec loop current_env = function
+    | [] -> 
+        let env_dupa_bloc = Env.fold (fun cheie valoare acc ->
+          if Env.mem cheie env then 
+            Env.add cheie valoare acc 
+          else 
+            acc
+        ) current_env env in
+        Continue env_dupa_bloc
+        
+    | s :: rest ->
+        (match exec_stmt current_env s with
+         | Continue env' -> loop env' rest
+         | Exit (v, env') -> Exit (v, env'))
+  in loop env stmts
 
-(* Execută while loop *)
 and exec_while env cond body =
   let (v, env') = eval_expr env cond in
   if not (is_truthy v) then
-    Continue env'  (* condiție falsă, ieșim *)
+    Continue env'
   else
     match exec_stmt env' body with
-    | Continue env'' -> exec_while env'' cond body  (* continuă loop *)
-    | Exit (v, env'') -> Exit (v, env'')  (* propagă return *)
+    | Continue env'' -> exec_while env'' cond body 
+    | Exit (v, env'') -> Exit (v, env'')  
 
 (* === FUNCȚIA PRINCIPALĂ === *)
 

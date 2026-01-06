@@ -39,15 +39,33 @@ $$\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle$$
 \section{Semantica Instrucțiunilor}
 Instrucțiunile transformă starea $\sigma$. Introducem o stare specială $Exit(v)$ pentru a gestiona instrucțiunea \texttt{return} [cite: 733-734].
 
-\subsection{Reguli de Control}
+\section{Semantica Instrucțiunilor (Actualizată cu Block Scoping)}
+
+\subsection{Reguli de Control și Vizibilitate}
 \begin{itemize}
-    \item \textbf{Skip:} $\langle \text{;}, \sigma \rangle \to \sigma$[cite: 773].
-    \item \textbf{Declarație (Let):} $\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle \text{let } x = e, \sigma \rangle \to \sigma'[x \leftarrow v]}$ sau $\langle \text{let } x, \sigma \rangle \to \sigma[x \leftarrow \text{Unit}]$ [cite: 767-768].
-    \item \textbf{Secvențiere (Bloc):} $\frac{\langle s_1, \sigma \rangle \to \sigma'' \quad \sigma'' \text{ nu este } Exit \quad \langle s_2, \sigma'' \rangle \to \sigma'}{\langle \{s_1, s_2\}, \sigma \rangle \to \sigma'}$
+    \item \textbf{Skip:} $\langle \text{;}, \sigma \rangle \to \sigma$.
+
+    \item \textbf{Declarație (Let):} $\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle \text{let } x = e, \sigma \rangle \to \sigma'[x \leftarrow v]}$ sau $\langle \text{let } x, \sigma \rangle \to \sigma[x \leftarrow \text{Unit}]$.
+
+    \item \textbf{Secvențiere:} $\frac{\langle s_1, \sigma \rangle \to \sigma'' \quad \sigma'' \neq Exit \quad \langle s_2, \sigma'' \rangle \to \sigma'}{\langle s_1; s_2, \sigma \rangle \to \sigma'}$
+
+    \item \textbf{Bloc (Scoping):} $\frac{\langle ss, \sigma \rangle \to \sigma_{final}}{\langle \{ ss \}, \sigma \rangle \to \sigma'}$ 
+    \\ unde starea rezultată $\sigma'$ elimină variabilele locale:
+    \[
+    \sigma'(x) = 
+    \begin{cases} 
+      \sigma_{final}(x) & \text{dacă } x \in \text{dom}(\sigma) \\
+      \bot & \text{dacă } x \notin \text{dom}(\sigma) 
+    \end{cases}
+    \]
+
     \item \textbf{Condițional (If-Else):}
-    $$\frac{\langle e, \sigma \rangle \Downarrow \langle \text{true}, \sigma'' \rangle \quad \langle s_1, \sigma'' \rangle \to \sigma'}{\langle \text{if } (e) \text{ } s_1 \text{ else } s_2, \sigma \rangle \to \sigma'} \quad \frac{\langle e, \sigma \rangle \Downarrow \langle \text{false}, \sigma'' \rangle \quad \langle s_2, \sigma'' \rangle \to \sigma'}{\langle \text{if } (e) \text{ } s_1 \text{ else } s_2, \sigma \rangle \to \sigma'}$$[cite: 733, 770].
+    \[ \frac{\langle e, \sigma \rangle \Downarrow \langle \text{true}, \sigma'' \rangle \quad \langle s_1, \sigma'' \rangle \to \sigma'}{\langle \text{if } (e) \text{ } s_1 \text{ else } s_2, \sigma \rangle \to \sigma'} \]
+    \[ \frac{\langle e, \sigma \rangle \Downarrow \langle \text{false}, \sigma'' \rangle \quad \langle s_2, \sigma'' \rangle \to \sigma'}{\langle \text{if } (e) \text{ } s_1 \text{ else } s_2, \sigma \rangle \to \sigma'} \]
+
     \item \textbf{Repetiție (While):}
-    $$\frac{\langle e, \sigma \rangle \Downarrow \langle \text{false}, \sigma' \rangle}{\langle \text{while } (e) \text{ } s, \sigma \rangle \to \sigma'} \quad \frac{\langle e, \sigma \rangle \Downarrow \langle \text{true}, \sigma'' \rangle \quad \langle s, \sigma'' \rangle \to \sigma''' \quad \langle \text{while } (e) \text{ } s, \sigma''' \rangle \to \sigma'}{\langle \text{while } (e) \text{ } s, \sigma \rangle \to \sigma'}$$[cite: 733, 772].
+    \[ \frac{\langle e, \sigma \rangle \Downarrow \langle \text{false}, \sigma' \rangle}{\langle \text{while } (e) \text{ } s, \sigma \rangle \to \sigma'} \]
+    \[ \frac{\langle e, \sigma \rangle \Downarrow \langle \text{true}, \sigma'' \rangle \quad \langle s, \sigma'' \rangle \to \sigma''' \quad \langle \text{while } (e) \text{ } s, \sigma''' \rangle \to \sigma'}{\langle \text{while } (e) \text{ } s, \sigma \rangle \to \sigma'} \]
 \end{itemize}
 
 \section{Semantica Instrucțiunii Return}
@@ -56,6 +74,6 @@ $$\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle
 Dacă un bloc întâlnește o stare $Exit(v)$, toate instrucțiunile următoare sunt sărite.
 
 \section{Sistemul de Tipizare}
-Limbajul utilizează \textbf{Strong Typing la runtime}. Orice operație între tipuri incompatibile (ex: adunarea unui \texttt{Int} cu un \texttt{String}) va opri execuția cu o eroare de tip \texttt{RuntimeError}, fără a încerca conversia automată a valorilor[cite: 735].
+Limbajul utilizează \textbf{Strong Typing la runtime}. Orice operație între tipuri incompatibile (ex: adunarea unui \texttt{Int} cu un \texttt{String}) va opri execuția cu o eroare de tip \texttt{RuntimeError}, fără a încerca conversia automată a valorilor.
 
 \end{document}
