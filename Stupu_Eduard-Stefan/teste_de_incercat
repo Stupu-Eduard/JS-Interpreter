@@ -1,0 +1,581 @@
+## Program 1: Literali și Tipuri de Date
+
+```javascript
+let intreg = 42;
+let real = 3.14;
+let adevarat = true;
+let fals = false;
+let caracter = 'A';
+let text = "Salut! ";
+```
+
+**Rezultat așteptat:**
+```
+intreg = 42
+real = 3.14
+adevarat = true
+fals = false
+caracter = A
+text = "Salut!"
+```
+
+---
+
+## Program 2: Operații Aritmetice
+
+```javascript
+let suma = 15 + 7;
+let diferenta = 20 - 8;
+let produs = 6 * 7;
+let cat = 100 / 4;
+let rest = 17 % 5;
+
+// Operatii pe reale
+let suma_r = 3.5 + 2.5;
+let produs_r = 2.5 * 4.0;
+```
+
+**Rezultat așteptat:**
+```
+suma = 22
+diferenta = 12
+produs = 42
+cat = 25
+rest = 2
+suma_r = 6. 
+produs_r = 10.
+```
+
+---
+
+## Program 3: Operatori de Comparație
+
+```javascript
+let a = 10;
+let b = 20;
+
+let mai_mic = a < b;
+let mai_mic_egal = a <= 10;
+let mai_mare = b > a;
+let mai_mare_egal = b >= 25;
+let egal = a == 10;
+let diferit = a != b;
+```
+
+**Rezultat așteptat:**
+```
+a = 10
+b = 20
+
+mai_mic = true
+mai_mic_egal = true
+mai_mare = true
+mai_mare_egal = false
+egal = true
+diferit = true
+```
+
+---
+
+## Program 4: Operatori Logici
+
+```javascript
+let p = true;
+let q = false;
+
+let si = p && q;
+let sau = p || q;
+let negatie_p = !p;
+let negatie_q = !q;
+let complex = (p || q) && !q;
+```
+
+**Rezultat așteptat:**
+```
+let p = true;
+let q = false;
+
+si = false
+sau = true
+negatie_p = false
+negatie_q = true
+complex = true
+```
+
+---
+
+## Program 5: Operatori Unari
+
+```javascript
+let pozitiv = 42;
+let negativ = -42;
+let neg_expresie = -(10 + 5);
+let neg_real = -3.14;
+
+let bool_val = true;
+let neg_bool = !bool_val;
+```
+
+**Rezultat așteptat:**
+```
+pozitiv = 42
+negativ = -42
+neg_expresie = -15
+neg_real = -3.14
+bool_val = true
+neg_bool = false
+```
+
+---
+
+## Program 6: Precedența Operatorilor
+
+```javascript
+// Inmultirea are prioritate fata de adunare
+let expr1 = 2 + 3 * 4;
+
+// Parantezele schimba ordinea
+let expr2 = (2 + 3) * 4;
+
+// Impartirea are prioritate fata de scadere
+let expr3 = 10 - 8 / 2;
+
+// Comparatii si operatori logici
+let expr4 = 5 > 3 && 10 < 20;
+```
+
+**Rezultat așteptat:**
+```
+expr1 = 14      (2 + 12, nu 5 * 4)
+expr2 = 20      (5 * 4)
+expr3 = 6       (10 - 4, nu 2 / 2)
+expr4 = true    (true && true)
+```
+
+---
+
+## Program 7: Variabile și Atribuiri
+
+```javascript
+let x = 10;
+let y = x;
+let z = x + y;
+
+x = 50;
+
+let w = y = 100;
+```
+
+**Rezultat așteptat:**
+```
+x = 50
+y = 100
+z = 20
+w = 100
+```
+
+---
+
+## Program 8: Declarație fără Inițializare
+
+```javascript
+let neinitializat;
+let initializat = 42;
+```
+
+**Rezultat așteptat:**
+```
+neinitializat = undefined
+initializat = 42
+```
+
+---
+
+## Program 9: Structura If-Else (ramura true)
+
+```javascript
+let nota = 85;
+let rezultat = "nepromovat";
+
+if (nota >= 50) {
+    rezultat = "promovat";
+} else {
+    rezultat = "nepromovat";
+}
+```
+
+**Rezultat așteptat:**
+```
+nota = 85
+rezultat = "promovat"
+```
+
+---
+
+## Program 10: Structura If-Else (ramura false)
+
+```javascript
+let nota = 35;
+let rezultat = "necunoscut";
+
+if (nota >= 50) {
+    rezultat = "promovat";
+} else {
+    rezultat = "nepromovat";
+}
+```
+
+**Rezultat așteptat:**
+```
+nota = 35
+rezultat = "nepromovat"
+```
+
+---
+
+## Program 11: If-Else cu Condiții Complexe
+
+```javascript
+let varsta = 25;
+let are_permis = true;
+let poate_conduce = false;
+
+if (varsta >= 18 && are_permis) {
+    poate_conduce = true;
+} else {
+    poate_conduce = false;
+}
+```
+
+**Rezultat așteptat:**
+```
+varsta = 25
+are_permis = true
+poate_conduce = true
+```
+
+---
+
+## Program 12: Bucla While - Numărătoare
+
+```javascript
+let i = 1;
+let suma = 0;
+
+while (i <= 5) {
+    suma = suma + i;
+    i = i + 1;
+}
+```
+
+**Rezultat așteptat:**
+```
+i = 6
+suma = 15      (1+2+3+4+5)
+```
+
+---
+
+## Program 13: Bucla While - Condiție Inițial Falsă
+
+```javascript
+let x = 100;
+let executat = false;
+
+while (x < 0) {
+    executat = true;
+    x = x + 1;
+}
+```
+
+**Rezultat așteptat:**
+```
+x = 100
+executat = false
+```
+
+---
+
+## Program 14: While cu Condiție Complexă
+
+```javascript
+let n = 10;
+let suma = 0;
+
+while (n > 0 && suma < 30) {
+    suma = suma + n;
+    n = n - 1;
+}
+```
+
+**Rezultat așteptat:**
+```
+n = 6
+suma = 34      (10+9+8+7 = 34, se oprește când suma >= 30)
+```
+
+---
+
+## Program 15: Instrucțiunea Return
+
+```javascript
+let rezultat = 42;
+return rezultat;
+let nu_se_executa = 100;
+```
+
+**Rezultat așteptat:**
+```
+Program terminat cu return:  42
+(variabila nu_se_executa NU apare în stare)
+```
+
+---
+
+## Program 16: Return cu Expresie Complexă
+
+```javascript
+let baza = 5;
+let inaltime = 10;
+return baza * inaltime / 2;
+```
+
+**Rezultat așteptat:**
+```
+Program terminat cu return:  25
+```
+
+---
+
+## Program 17: Concatenare Șiruri
+
+```javascript
+let prenume = "Ion";
+let nume = "Popescu";
+let spatiu = " ";
+let nume_complet = prenume + spatiu + nume;
+```
+
+**Rezultat așteptat:**
+```
+prenume = "Ion"
+nume = "Popescu"
+spatiu = " "
+nume_complet = "Ion Popescu"
+```
+
+---
+
+## Program 18: Concatenare String cu Int
+
+```javascript
+let mesaj = "Rezultatul este: ";
+let valoare = 42;
+let output = mesaj + valoare;
+```
+
+**Rezultat așteptat:**
+```
+mesaj = "Rezultatul este: "
+valoare = 42
+output = "Rezultatul este: 42"
+```
+
+---
+
+## Program 19: Factorial Iterativ
+
+```javascript
+// Calculează 5! = 120
+let n = 5;
+let factorial = 1;
+
+while (n > 0) {
+    factorial = factorial * n;
+    n = n - 1;
+}
+
+return factorial;
+```
+
+**Rezultat așteptat:**
+```
+Program terminat cu return:  120
+```
+
+---
+
+## Program 20: Suma Numerelor Pare și Impare
+
+```javascript
+let i = 1;
+let suma_pare = 0;
+let suma_impare = 0;
+
+while (i <= 10) {
+    if (i % 2 == 0) {
+        suma_pare = suma_pare + i;
+    } else {
+        suma_impare = suma_impare + i;
+    }
+    i = i + 1;
+}
+```
+
+**Rezultat așteptat:**
+```
+i = 11
+suma_pare = 30     (2+4+6+8+10)
+suma_impare = 25   (1+3+5+7+9)
+```
+
+---
+
+## Program 21: Număr Prim (Verificare Simplă)
+
+```javascript
+let numar = 17;
+let este_prim = true;
+let divisor = 2;
+
+while (divisor < numar && este_prim) {
+    if (numar % divisor == 0) {
+        este_prim = false;
+    } else {
+        divisor = divisor + 1;
+    }
+}
+```
+
+**Rezultat așteptat:**
+```
+numar = 17
+este_prim = true
+divisor = 17
+```
+
+---
+
+## Program 22: Fibonacci (primii n termeni suma)
+
+```javascript
+let n = 10;
+let a = 0;
+let b = 1;
+let suma = 0;
+let count = 0;
+
+while (count < n) {
+    suma = suma + a;
+    let temp = a + b;
+    a = b;
+    b = temp;
+    count = count + 1;
+}
+
+return suma;
+```
+
+**Rezultat așteptat:**
+```
+Program terminat cu return:  88
+(0+1+1+2+3+5+8+13+21+34 = 88)
+```
+
+---
+
+## Program 23: Comentarii (Ignorate)
+
+```javascript
+// Acesta este un comentariu
+let x = 10; // Comentariu pe linie
+// Alt comentariu
+let y = 20;
+// let z = 30; - aceasta linie e comentata
+```
+
+**Rezultat așteptat:**
+```
+x = 10
+y = 20
+(z NU există)
+```
+
+---
+
+## Program 24: Blocuri Imbricate
+
+```javascript
+let nivel1 = 1;
+{
+    let nivel2 = 2;
+    {
+        let nivel3 = 3;
+    }
+}
+```
+
+**Rezultat așteptat:**
+```
+nivel1 = 1
+
+```
+
+---
+
+## EXTRA 1: Funcții
+```javascript
+function add(a, b) {
+    return a + b;
+}
+
+let x = 10;
+let y = add(x, 5);
+return y;
+```
+
+**Rezultat așteptat:**
+```
+RETURN (a + b);
+LET x = 10;
+LET y = add(x, 5);
+RETURN y;
+Parserul a construit arborele perfect!
+
+=== EXECUȚIE ===
+
+Program terminat cu return:  15
+```
+
+## EXTRA 2: Domenii de vizibilitate
+
+```javascript
+let global = 100;
+let modificata = 10;
+let shadowed = "original";
+
+{
+    let local_exterior = 50;
+    
+    modificata = modificata + local_exterior;
+    
+    let shadowed = "in bloc";
+    
+    {
+        let local_interior = 25;
+        
+        global = global + local_interior;
+    }
+}
+```
+
+**Rezultat așteptat:**
+```
+[OK] Program executat cu succes.
+Starea finală a variabilelor:
+  global = 125
+  modificata = 60
+  shadowed = "original"
+```
+---
+
