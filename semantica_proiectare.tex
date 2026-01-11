@@ -236,4 +236,130 @@ Interpretorul genereaza urmatoarele tipuri de erori:
     \item \texttt{TypeError} - operatie pe tipuri incompatibile
 \end{itemize}
 
+\newpage
+
+\section{Sintaxa Limbajului (BNF)}
+\label{sec:bnf}
+\begin{verbatim}
+<program>      ::= <stmt>*
+<stmt>         ::= 'let' <id> '=' <expr> ';'
+                | 'let' <id> ';'
+                | <expr> ';'
+                | 'if' '(' <expr> ')' <stmt> 'else' <stmt>
+                | 'while' '(' <expr> ')' <stmt>
+                | '{' <stmt>* '}'
+                | 'function' <id> '(' <params> ')' <stmt>
+                | 'return' <expr> ';'
+<params>       ::= <id> (',' <id>)* | ε
+<expr>         ::= <int> | <float> | <bool> | <char> | <string> | <id>
+                | <id> '=' <expr>
+                | <expr> <binop> <expr>
+                | <unop> <expr>
+                | <id> '(' <args> ')'
+                | 'function' '(' <params> ')' <stmt>
+                | '(' <expr> ')'
+<args>         ::= <expr> (',' <expr>)* | ε
+<binop>        ::= '+' | '-' | '*' | '/' | '%' | '==' | '!=' | '<' | '<=' | '>' | '>=' | '&&' | '||'
+<unop>         ::= '-' | '!'
+<id>           ::= [a-zA-Z_][a-zA-Z0-9_]*
+<int>          ::= [0-9]+
+<float>        ::= [0-9]+'.'[0-9]+
+<bool>         ::= 'true' | 'false'
+<char>         ::= '\'' . '\''
+<string>       ::= '"' .* '"'
+\end{verbatim}
+
+\section{Decizii de Proiectare}
+\begin{itemize}
+    \item \textbf{Limbaj de implementare:} OCaml, pentru ușurința manipulării structurii de date și pattern matching.
+    \item \textbf{Atribuirea este expresie:} Permite scrierea de expresii complexe și assignment chaining.
+    \item \textbf{Block scoping:} Domeniile de vizibilitate sunt ca în JavaScript (ES6+), cu shadowing și eliminarea variabilelor locale la ieșirea din bloc.
+    \item \textbf{Funcții ca valori de primă clasă:} Suportă closures și recursivitate.
+    \item \textbf{Tipizare dinamică:} Verificarea tipurilor se face la execuție, nu la compilare.
+    \item \textbf{Erori explicite:} Orice acces la variabile nedeclarate sau operații pe tipuri incompatibile opresc execuția cu mesaj clar.
+\end{itemize}
+
+\section{Exemple de Utilizare}
+\subsection{Expresii și Control}
+\begin{lstlisting}[style=jsstyle]
+let x = 10;
+let y = 20;
+let suma = x + y * 2;
+if (suma > 30) {
+    suma = suma - 5;
+} else {
+    suma = suma + 5;
+}
+\end{lstlisting}
+
+\subsection{Funcții și Recursivitate}
+\begin{lstlisting}[style=jsstyle]
+function factorial(n) {
+    if (n <= 1) {
+        return 1;
+    } else {
+        return n * factorial(n - 1);
+    }
+}
+let f5 = factorial(5); // f5 = 120
+\end{lstlisting}
+
+\subsection{Domenii de Vizibilitate}
+\begin{lstlisting}[style=jsstyle]
+let a = 1;
+{
+    let a = 2;
+    // aici a = 2
+}
+// aici a = 1
+\end{lstlisting}
+
+\subsection{Closure}
+\begin{lstlisting}[style=jsstyle]
+function make_adder(x) {
+    return function(y) { return x + y; };
+}
+let add5 = make_adder(5);
+let z = add5(3); // z = 8
+\end{lstlisting}
+
+\section{Testare și Exemplu de Rulare}
+Testele pentru interpretor se găsesc în fișierul \texttt{teste\_de\_incercat}. Acesta conține peste 20 de programe care acoperă toate funcționalitățile cerute:
+\begin{itemize}
+    \item Literali și tipuri de bază
+    \item Operații aritmetice și logice
+    \item Control flow: if, while
+    \item Funcții, recursivitate, closure
+    \item Domenii de vizibilitate și shadowing
+    \item Return și blocuri imbricate
+    \item Erori de tip și variabile nedeclarate
+\end{itemize}
+Pentru a rula un test, copiați programul dorit în \texttt{test.js} și executați:\\
+\texttt{./run.sh \\ ./interpretor}
+\newline
+Rezultatul va fi afișat în consolă, inclusiv starea finală a variabilelor sau valoarea returnată. Exemple de output se găsesc în secțiunea de exemple și în fișierul de teste.
+
+\section{User Documentation (Ghid de Utilizare)}
+\textbf{Cum folosești interpretorul JavaScript-PLP:}
+\begin{enumerate}
+    \item \textbf{Compilare:} În terminal, rulează scriptul de build:\\
+    \texttt{./run.sh}
+    \item \textbf{Scrie un program:} Creează sau editează fișierul \texttt{test.js} cu codul dorit (vezi exemplele din document).
+    \item \textbf{Rulează interpretorul:} După compilare, execută:\\
+    \texttt{./interpretor}
+    \item \textbf{Vezi rezultatul:} Starea finală a variabilelor sau valoarea returnată va fi afișată în consolă.
+\end{enumerate}
+\textbf{Exemplu complet:}
+\begin{lstlisting}[style=jsstyle]
+let x = 10;
+let y = 20;
+let suma = x + y;
+return suma;
+\end{lstlisting}
+\textbf{Output:}
+\begin{verbatim}
+[OK] Program terminat cu return: 30
+\end{verbatim}
+\textbf{Testare automată:} (opțional) Pentru a testa mai multe programe, copiază pe rând codul din \texttt{teste\_de\_incercat} în \texttt{test.js} și rulează interpretorul. Fiecare test are și rezultatul așteptat pentru comparație.
+
 \end{document}

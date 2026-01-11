@@ -29,3 +29,11 @@
 \contentsline {subsection}{\numberline {7.1}Tipuri Suportate}{6}{}%
 \contentsline {subsection}{\numberline {7.2}Coercitie Limitata}{6}{}%
 \contentsline {section}{\numberline {8}Tratarea Erorilor}{7}{}%
+\contentsline {section}{\numberline {9}Sintaxa Limbajului (BNF)}{8}{}%
+\contentsline {section}{\numberline {10}Decizii de Proiectare}{8}{}%
+\contentsline {section}{\numberline {11}Exemple de Utilizare}{9}{}%
+\contentsline {subsection}{\numberline {11.1}Expresii și Control}{9}{}%
+\contentsline {subsection}{\numberline {11.2}Funcții și Recursivitate}{9}{}%
+\contentsline {subsection}{\numberline {11.3}Domenii de Vizibilitate}{9}{}%
+\contentsline {subsection}{\numberline {11.4}Closure}{9}{}%
+\contentsline {section}{\numberline {12}Testare și Exemplu de Rulare}{9}{}%
