@@ -1,79 +1,239 @@
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
+\usepackage[romanian]{babel}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
 \geometry{a4paper, margin=1in}
 
+% Configurare pentru cod JavaScript
+\lstdefinestyle{jsstyle}{
+    language=Java,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    stringstyle=\color{red},
+    commentstyle=\color{green!50!black},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    morekeywords={let, function, return, if, else, while, true, false}
+}
+
 \title{Proiectarea Semanticii Limbajului JavaScript-PLP}
-\author{Secțiunea C - Documentație Tehnică}
+\author{Documentatie Tehnica}
 \date{\today}
 
 \begin{document}
 
 \maketitle
 
-\section{Modelul Semanticii Operaționale}
-Semantica limbajului este definită utilizând \textbf{Semantica Operațională Big-Step}. Deoarece în acest limbaj atribuirea este o expresie, evaluarea oricărei expresii poate modifica starea programului [cite: 730, 749-750].
+\tableofcontents
+\newpage
+
+\section{Introducere}
+Acest document descrie semantica operationala a unui interpretor pentru un subset al limbajului JavaScript. Interpretorul este implementat in OCaml si suporta:
+\begin{itemize}
+    \item Tipuri de date: Int, Float, Bool, Char, String, Undefined
+    \item Expresii aritmetice, logice si de comparatie
+    \item Instructiuni: declaratii, atribuiri, if-else, while, return
+    \item Functii cu suport pentru recursivitate
+    \item Domenii de vizibilitate (block scoping) cu shadowing
+\end{itemize}
+
+\section{Modelul Semanticii Operationale}
+Semantica limbajului este definita utilizand \textbf{Semantica Operationala Big-Step}. Deoarece in acest limbaj atribuirea este o expresie, evaluarea oricarei expresii poate modifica starea programului.
 
 \subsection{Starea Programului (Environment)}
-Starea programului, notată cu $\sigma$, este o funcție care mapează identificatorii la valorile lor:
+Starea programului, notata cu $\sigma$, este o functie care mapeaza identificatorii la valorile lor:
 $$\sigma \in \text{Env} = \text{Var} \to \text{Value} \cup \{\bot\}$$
-unde $\text{Value} = \{ \text{Int, Float, Bool, Char, String, Unit} \}$[cite: 729].
+unde $\text{Value} = \{ \text{VInt, VFloat, VBool, VChar, VString, VUndefined, VFunc} \}$.
+
+\subsection{Valorile Functiilor}
+O valoare de tip functie contine:
+$$\text{VFunc}(\text{params}, \text{body}, \sigma_{closure})$$
+unde:
+\begin{itemize}
+    \item \texttt{params} - lista parametrilor formali
+    \item \texttt{body} - corpul functiei (instructiune)
+    \item $\sigma_{closure}$ - environment-ul capturat la momentul definirii (closure)
+\end{itemize}
 
 \section{Semantica Expresiilor}
-Evaluarea unei expresii $e$ în starea $\sigma$ produce o valoare $v$ și o stare nouă $\sigma'$ (datorită posibilelor atribuiri):
+Evaluarea unei expresii $e$ in starea $\sigma$ produce o valoare $v$ si o stare noua $\sigma'$ (datorita posibilelor atribuiri):
 $$\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle$$
 
 \subsection{Reguli pentru Expresii}
+
+\subsubsection{Constante si Variabile}
 \begin{itemize}
     \item \textbf{Constante:} $\langle c, \sigma \rangle \Downarrow \langle c, \sigma \rangle$
-    \item \textbf{Variabile:} $\frac{\sigma(x) = v}{\langle x, \sigma \rangle \Downarrow \langle v, \sigma \rangle}$
-    \item \textbf{Atribuire:} $\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle x = e, \sigma \rangle \Downarrow \langle v, \sigma'[x \leftarrow v] \rangle}$ (returnează valoarea și actualizează starea)[cite: 731, 750].
-    \item \textbf{Operații Binare:} $\frac{\langle e_1, \sigma \rangle \Downarrow \langle v_1, \sigma'' \rangle \quad \langle e_2, \sigma'' \rangle \Downarrow \langle v_2, \sigma' \rangle \quad v = v_1 \oplus v_2}{\langle e_1 \oplus e_2, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}$ \\
-    \textit{Notă: $e_2$ se evaluează în starea $\sigma''$ produsă de $e_1$.}[cite: 730].
-    \item \textbf{Operații Unare (NOT, Neg):} $\frac{\langle e, \sigma \rangle \Downarrow \langle v_1, \sigma' \rangle \quad v = \ominus v_1}{\langle \ominus e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}$ [cite: 764-765].
+    \item \textbf{Variabile:} $\dfrac{\sigma(x) = v}{\langle x, \sigma \rangle \Downarrow \langle v, \sigma \rangle}$
 \end{itemize}
 
-\section{Semantica Instrucțiunilor}
-Instrucțiunile transformă starea $\sigma$. Introducem o stare specială $Exit(v)$ pentru a gestiona instrucțiunea \texttt{return} [cite: 733-734].
+\subsubsection{Atribuire}
+Atribuirea este o expresie care returneaza valoarea atribuita:
+$$\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle \quad x \in \text{dom}(\sigma')}{\langle x = e, \sigma \rangle \Downarrow \langle v, \sigma'[x \leftarrow v] \rangle}$$
 
-\section{Semantica Instrucțiunilor (Actualizată cu Block Scoping)}
+\subsubsection{Operatii Binare}
+$$\frac{\langle e_1, \sigma \rangle \Downarrow \langle v_1, \sigma'' \rangle \quad \langle e_2, \sigma'' \rangle \Downarrow \langle v_2, \sigma' \rangle \quad v = v_1 \oplus v_2}{\langle e_1 \oplus e_2, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}$$
+\textit{Nota: $e_2$ se evalueaza in starea $\sigma''$ produsa de $e_1$ (evaluare de la stanga la dreapta).}
 
-\subsection{Reguli de Control și Vizibilitate}
+\subsubsection{Operatii Unare}
+$$\frac{\langle e, \sigma \rangle \Downarrow \langle v_1, \sigma' \rangle \quad v = \ominus v_1}{\langle \ominus e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}$$
+
+\section{Semantica Functiilor}
+
+\subsection{Declaratia Functiilor}
+Declaratia unei functii adauga o valoare de tip \texttt{VFunc} in environment:
+$$\frac{f_{val} = \text{VFunc}(\text{params}, \text{body}, \sigma)}{\langle \text{function } f(\text{params}) \{ \text{body} \}, \sigma \rangle \to \sigma[f \leftarrow f_{val}]}$$
+
+\subsection{Apelul Functiilor}
+Apelul unei functii implica:
+\begin{enumerate}
+    \item Evaluarea argumentelor (de la stanga la dreapta)
+    \item Crearea unui environment local cu parametrii legati la argumente
+    \item Executia corpului functiei in environment-ul local
+    \item Returnarea valorii (sau \texttt{undefined} daca nu exista \texttt{return})
+\end{enumerate}
+
+$$\frac{
+\begin{array}{c}
+\sigma(f) = \text{VFunc}(\text{params}, \text{body}, \sigma_c) \\
+\langle \text{args}, \sigma \rangle \Downarrow \langle \text{vals}, \sigma' \rangle \\
+\sigma_{call} = \sigma_c[f \leftarrow \sigma(f)][\text{params} \leftarrow \text{vals}] \\
+\langle \text{body}, \sigma_{call} \rangle \to Exit(v)
+\end{array}
+}{\langle f(\text{args}), \sigma \rangle \Downarrow \langle v, \sigma' \rangle}$$
+
+\subsection{Recursivitate}
+Pentru a suporta recursivitatea, functia este adaugata in propriul environment de apel:
+$$\sigma_{call} = \sigma_{closure}[f \leftarrow \text{VFunc}(\text{params}, \text{body}, \sigma_{closure})]$$
+Astfel, in corpul functiei, apelurile recursive gasesc functia in environment.
+
+\subsection{Exemplu: Factorial Recursiv}
+\begin{lstlisting}[style=jsstyle]
+function factorial(n) {
+    if (n <= 1) {
+        return 1;
+    } else {
+        return n * factorial(n - 1);
+    }
+}
+let result = factorial(5);  // result = 120
+\end{lstlisting}
+
+\section{Semantica Instructiunilor}
+Instructiunile transforma starea $\sigma$. Introducem o stare speciala $Exit(v)$ pentru a gestiona instructiunea \texttt{return}.
+
+\subsection{Reguli de Baza}
 \begin{itemize}
-    \item \textbf{Skip:} $\langle \text{;}, \sigma \rangle \to \sigma$.
+    \item \textbf{Skip:} $\langle \text{;}, \sigma \rangle \to \sigma$
 
-    \item \textbf{Declarație (Let):} $\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle \text{let } x = e, \sigma \rangle \to \sigma'[x \leftarrow v]}$ sau $\langle \text{let } x, \sigma \rangle \to \sigma[x \leftarrow \text{Unit}]$.
+    \item \textbf{Declaratie cu initializare:} 
+    $$\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle \text{let } x = e, \sigma \rangle \to \sigma'[x \leftarrow v]}$$
 
-    \item \textbf{Secvențiere:} $\frac{\langle s_1, \sigma \rangle \to \sigma'' \quad \sigma'' \neq Exit \quad \langle s_2, \sigma'' \rangle \to \sigma'}{\langle s_1; s_2, \sigma \rangle \to \sigma'}$
+    \item \textbf{Declaratie fara initializare:} 
+    $$\langle \text{let } x, \sigma \rangle \to \sigma[x \leftarrow \text{undefined}]$$
 
-    \item \textbf{Bloc (Scoping):} $\frac{\langle ss, \sigma \rangle \to \sigma_{final}}{\langle \{ ss \}, \sigma \rangle \to \sigma'}$ 
-    \\ unde starea rezultată $\sigma'$ elimină variabilele locale:
-    \[
-    \sigma'(x) = 
-    \begin{cases} 
-      \sigma_{final}(x) & \text{dacă } x \in \text{dom}(\sigma) \\
-      \bot & \text{dacă } x \notin \text{dom}(\sigma) 
-    \end{cases}
-    \]
-
-    \item \textbf{Condițional (If-Else):}
-    \[ \frac{\langle e, \sigma \rangle \Downarrow \langle \text{true}, \sigma'' \rangle \quad \langle s_1, \sigma'' \rangle \to \sigma'}{\langle \text{if } (e) \text{ } s_1 \text{ else } s_2, \sigma \rangle \to \sigma'} \]
-    \[ \frac{\langle e, \sigma \rangle \Downarrow \langle \text{false}, \sigma'' \rangle \quad \langle s_2, \sigma'' \rangle \to \sigma'}{\langle \text{if } (e) \text{ } s_1 \text{ else } s_2, \sigma \rangle \to \sigma'} \]
-
-    \item \textbf{Repetiție (While):}
-    \[ \frac{\langle e, \sigma \rangle \Downarrow \langle \text{false}, \sigma' \rangle}{\langle \text{while } (e) \text{ } s, \sigma \rangle \to \sigma'} \]
-    \[ \frac{\langle e, \sigma \rangle \Downarrow \langle \text{true}, \sigma'' \rangle \quad \langle s, \sigma'' \rangle \to \sigma''' \quad \langle \text{while } (e) \text{ } s, \sigma''' \rangle \to \sigma'}{\langle \text{while } (e) \text{ } s, \sigma \rangle \to \sigma'} \]
+    \item \textbf{Expresie ca instructiune:} 
+    $$\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle e;, \sigma \rangle \to \sigma'}$$
 \end{itemize}
 
-\section{Semantica Instrucțiunii Return}
-Instrucțiunea \texttt{return} oprește execuția imediată a blocului curent și propagă valoarea[cite: 734, 766]:
-$$\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle \text{return } e, \sigma \rangle \to Exit(v)}$$
-Dacă un bloc întâlnește o stare $Exit(v)$, toate instrucțiunile următoare sunt sărite.
+\subsection{Structuri de Control}
 
-\section{Sistemul de Tipizare}
-Limbajul utilizează \textbf{Strong Typing la runtime}. Orice operație între tipuri incompatibile (ex: adunarea unui \texttt{Int} cu un \texttt{String}) va opri execuția cu o eroare de tip \texttt{RuntimeError}, fără a încerca conversia automată a valorilor.
+\subsubsection{Conditionala (If-Else)}
+$$\frac{\langle e, \sigma \rangle \Downarrow \langle \text{true}, \sigma'' \rangle \quad \langle s_1, \sigma'' \rangle \to \sigma'}{\langle \text{if } (e) \text{ } s_1 \text{ else } s_2, \sigma \rangle \to \sigma'}$$
+
+$$\frac{\langle e, \sigma \rangle \Downarrow \langle \text{false}, \sigma'' \rangle \quad \langle s_2, \sigma'' \rangle \to \sigma'}{\langle \text{if } (e) \text{ } s_1 \text{ else } s_2, \sigma \rangle \to \sigma'}$$
+
+\subsubsection{Bucla While}
+$$\frac{\langle e, \sigma \rangle \Downarrow \langle \text{false}, \sigma' \rangle}{\langle \text{while } (e) \text{ } s, \sigma \rangle \to \sigma'}$$
+
+$$\frac{\langle e, \sigma \rangle \Downarrow \langle \text{true}, \sigma'' \rangle \quad \langle s, \sigma'' \rangle \to \sigma''' \quad \langle \text{while } (e) \text{ } s, \sigma''' \rangle \to \sigma'}{\langle \text{while } (e) \text{ } s, \sigma \rangle \to \sigma'}$$
+
+\subsubsection{Return}
+Instructiunea \texttt{return} opreste executia si propaga valoarea:
+$$\frac{\langle e, \sigma \rangle \Downarrow \langle v, \sigma' \rangle}{\langle \text{return } e, \sigma \rangle \to Exit(v)}$$
+
+\section{Domenii de Vizibilitate (Scoping)}
+
+\subsection{Block Scoping}
+Variabilele declarate intr-un bloc \texttt{\{ \}} sunt vizibile doar in acel bloc. La iesirea din bloc, variabilele locale sunt eliminate:
+
+$$\frac{\langle \text{stmts}, \sigma \rangle \to \sigma_{final}}{\langle \{ \text{stmts} \}, \sigma \rangle \to \sigma'}$$
+
+unde starea rezultata $\sigma'$ pastreaza doar variabilele pre-existente:
+$$\sigma'(x) = \begin{cases} 
+  \sigma_{final}(x) & \text{daca } x \in \text{dom}(\sigma) \\
+  \bot & \text{daca } x \notin \text{dom}(\sigma) 
+\end{cases}$$
+
+\subsection{Shadowing}
+O variabila declarata intr-un bloc poate "umbri" o variabila cu acelasi nume din scope-ul exterior. La iesirea din bloc, valoarea originala este restaurata.
+
+\begin{lstlisting}[style=jsstyle]
+let x = 100;           // x global
+{
+    let x = 999;       // x local (shadowing)
+    // aici x = 999
+}
+// aici x = 100 (restaurat)
+\end{lstlisting}
+
+\subsection{Modificari vs Redeclarari}
+\begin{itemize}
+    \item \textbf{Atribuire} ($x = v$): Modifica valoarea variabilei existente. Modificarea persista dupa iesirea din bloc.
+    \item \textbf{Declaratie} ($\text{let } x = v$): Creaza o variabila noua locala. Variabila este eliminata la iesirea din bloc.
+\end{itemize}
+
+\subsection{Exemplu Complet}
+\begin{lstlisting}[style=jsstyle]
+let global = 100;
+let modificata = 10;
+let shadowed = "original";
+
+{
+    let local = 50;
+    modificata = modificata + local;  // Modificare
+    let shadowed = "in bloc";         // Shadowing
+}
+// Rezultat:
+// global = 100
+// modificata = 60  (modificarea persista)
+// shadowed = "original"  (valoarea restaurata)
+// local nu exista (eliminata)
+\end{lstlisting}
+
+\section{Sistemul de Tipuri}
+Limbajul utilizeaza \textbf{tipizare dinamica puternica} (strong dynamic typing). Operatiile intre tipuri incompatibile genereaza erori la runtime.
+
+\subsection{Tipuri Suportate}
+\begin{itemize}
+    \item \texttt{VInt} - numere intregi
+    \item \texttt{VFloat} - numere reale
+    \item \texttt{VBool} - valori booleene
+    \item \texttt{VChar} - caractere
+    \item \texttt{VString} - siruri de caractere
+    \item \texttt{VUndefined} - valoare nedefinita
+    \item \texttt{VFunc} - functii (first-class values)
+\end{itemize}
+
+\subsection{Coercitie Limitata}
+Limbajul permite cateva conversii implicite:
+\begin{itemize}
+    \item \texttt{Int + Float} $\to$ \texttt{Float}
+    \item \texttt{String + Int} $\to$ \texttt{String} (concatenare)
+\end{itemize}
+
+\section{Tratarea Erorilor}
+Interpretorul genereaza urmatoarele tipuri de erori:
+\begin{itemize}
+    \item \texttt{RuntimeError} - erori generale (impartire la zero, etc.)
+    \item \texttt{UndefinedVariable} - variabila nedeclarata
+    \item \texttt{TypeError} - operatie pe tipuri incompatibile
+\end{itemize}
 
 \end{document}

@@ -1,9 +1,6 @@
 ## Program 1: Literali și Tipuri de Date
 
-**Funcționalitate testată:** Declararea variabilelor cu diferite tipuri de date.
-
 ```javascript
-// Testare literali
 let intreg = 42;
 let real = 3.14;
 let adevarat = true;
@@ -26,10 +23,7 @@ text = "Salut!"
 
 ## Program 2: Operații Aritmetice
 
-**Funcționalitate testată:** Operatorii +, -, *, /, % pe numere întregi și reale.
-
 ```javascript
-// Operatii pe intregi
 let suma = 15 + 7;
 let diferenta = 20 - 8;
 let produs = 6 * 7;
@@ -56,8 +50,6 @@ produs_r = 10.
 
 ## Program 3: Operatori de Comparație
 
-**Funcționalitate testată:** Operatorii <, <=, >, >=, ==, !=
-
 ```javascript
 let a = 10;
 let b = 20;
@@ -72,6 +64,9 @@ let diferit = a != b;
 
 **Rezultat așteptat:**
 ```
+a = 10
+b = 20
+
 mai_mic = true
 mai_mic_egal = true
 mai_mare = true
@@ -83,8 +78,6 @@ diferit = true
 ---
 
 ## Program 4: Operatori Logici
-
-**Funcționalitate testată:** Operatorii &&, ||, ! 
 
 ```javascript
 let p = true;
@@ -99,6 +92,9 @@ let complex = (p || q) && !q;
 
 **Rezultat așteptat:**
 ```
+let p = true;
+let q = false;
+
 si = false
 sau = true
 negatie_p = false
@@ -109,8 +105,6 @@ complex = true
 ---
 
 ## Program 5: Operatori Unari
-
-**Funcționalitate testată:** Operatorul unar - (negație) și !  (negație logică)
 
 ```javascript
 let pozitiv = 42;
@@ -135,8 +129,6 @@ neg_bool = false
 ---
 
 ## Program 6: Precedența Operatorilor
-
-**Funcționalitate testată:** Ordinea corectă de evaluare a operatorilor. 
 
 ```javascript
 // Inmultirea are prioritate fata de adunare
@@ -164,17 +156,13 @@ expr4 = true    (true && true)
 
 ## Program 7: Variabile și Atribuiri
 
-**Funcționalitate testată:** Declararea, referențierea și modificarea variabilelor. 
-
 ```javascript
 let x = 10;
 let y = x;
 let z = x + y;
 
-// Modificare variabila
 x = 50;
 
-// Atribuire ca expresie (returneaza valoarea)
 let w = y = 100;
 ```
 
@@ -190,8 +178,6 @@ w = 100
 
 ## Program 8: Declarație fără Inițializare
 
-**Funcționalitate testată:** Variabile declarate fără valoare inițială.
-
 ```javascript
 let neinitializat;
 let initializat = 42;
@@ -206,8 +192,6 @@ initializat = 42
 ---
 
 ## Program 9: Structura If-Else (ramura true)
-
-**Funcționalitate testată:** Execuția ramurii true a instrucțiunii if. 
 
 ```javascript
 let nota = 85;
@@ -230,8 +214,6 @@ rezultat = "promovat"
 
 ## Program 10: Structura If-Else (ramura false)
 
-**Funcționalitate testată:** Execuția ramurii false a instrucțiunii if. 
-
 ```javascript
 let nota = 35;
 let rezultat = "necunoscut";
@@ -252,8 +234,6 @@ rezultat = "nepromovat"
 ---
 
 ## Program 11: If-Else cu Condiții Complexe
-
-**Funcționalitate testată:** Condiții compuse cu operatori logici. 
 
 ```javascript
 let varsta = 25;
@@ -278,8 +258,6 @@ poate_conduce = true
 
 ## Program 12: Bucla While - Numărătoare
 
-**Funcționalitate testată:** Execuția repetată a unui bloc de cod.
-
 ```javascript
 let i = 1;
 let suma = 0;
@@ -299,8 +277,6 @@ suma = 15      (1+2+3+4+5)
 ---
 
 ## Program 13: Bucla While - Condiție Inițial Falsă
-
-**Funcționalitate testată:** Bucla nu se execută dacă condiția e falsă de la început.
 
 ```javascript
 let x = 100;
@@ -322,8 +298,6 @@ executat = false
 
 ## Program 14: While cu Condiție Complexă
 
-**Funcționalitate testată:** Bucle cu condiții compuse.
-
 ```javascript
 let n = 10;
 let suma = 0;
@@ -344,8 +318,6 @@ suma = 34      (10+9+8+7 = 34, se oprește când suma >= 30)
 
 ## Program 15: Instrucțiunea Return
 
-**Funcționalitate testată:** Terminarea execuției și returnarea unei valori.
-
 ```javascript
 let rezultat = 42;
 return rezultat;
@@ -362,8 +334,6 @@ Program terminat cu return:  42
 
 ## Program 16: Return cu Expresie Complexă
 
-**Funcționalitate testată:** Return cu calcul în linie.
-
 ```javascript
 let baza = 5;
 let inaltime = 10;
@@ -378,8 +348,6 @@ Program terminat cu return:  25
 ---
 
 ## Program 17: Concatenare Șiruri
-
-**Funcționalitate testată:** Operatorul + pe șiruri de caractere.
 
 ```javascript
 let prenume = "Ion";
@@ -400,8 +368,6 @@ nume_complet = "Ion Popescu"
 
 ## Program 18: Concatenare String cu Int
 
-**Funcționalitate testată:** Conversie implicită la concatenare.
-
 ```javascript
 let mesaj = "Rezultatul este: ";
 let valoare = 42;
@@ -418,8 +384,6 @@ output = "Rezultatul este: 42"
 ---
 
 ## Program 19: Factorial Iterativ
-
-**Funcționalitate testată:** Program complet - calcul factorial.
 
 ```javascript
 // Calculează 5! = 120
@@ -442,8 +406,6 @@ Program terminat cu return:  120
 ---
 
 ## Program 20: Suma Numerelor Pare și Impare
-
-**Funcționalitate testată:** If-Else în interiorul While.
 
 ```javascript
 let i = 1;
@@ -471,8 +433,6 @@ suma_impare = 25   (1+3+5+7+9)
 
 ## Program 21: Număr Prim (Verificare Simplă)
 
-**Funcționalitate testată:** Algoritm complex cu bucle și condiții.
-
 ```javascript
 let numar = 17;
 let este_prim = true;
@@ -497,8 +457,6 @@ divisor = 17
 ---
 
 ## Program 22: Fibonacci (primii n termeni suma)
-
-**Funcționalitate testată:** Variabile multiple actualizate în buclă.
 
 ```javascript
 let n = 10;
@@ -528,8 +486,6 @@ Program terminat cu return:  88
 
 ## Program 23: Comentarii (Ignorate)
 
-**Funcționalitate testată:** Comentariile sunt ignorate de parser.
-
 ```javascript
 // Acesta este un comentariu
 let x = 10; // Comentariu pe linie
@@ -549,8 +505,6 @@ y = 20
 
 ## Program 24: Blocuri Imbricate
 
-**Funcționalitate testată:** Blocuri de cod în interiorul altor blocuri.
-
 ```javascript
 let nivel1 = 1;
 {
@@ -564,156 +518,64 @@ let nivel1 = 1;
 **Rezultat așteptat:**
 ```
 nivel1 = 1
-nivel2 = 2
-nivel3 = 3
+
 ```
 
 ---
 
-## Rezumat Funcționalități Testate
-
-| #     | Program    | Funcționalitate                                 |
-|---    |---------   |-----------------                                |
-| 1     | Literali   | Tipuri de date:  Int, Float, Bool, Char, String |
-| 2     | Aritmetice | Operatori: +, -, *, /, %                        |
-| 3     | Comparații | Operatori:  <, <=, >, >=, ==, !=                |
-| 4     | Logice     | Operatori:  &&, \|\|, !                         |
-| 5     | Unare      | Operatori:  -, !                                |
-| 6     | Precedență | Ordinea operatorilor                            |
-| 7     | Variabile  | Declarare, referențiere, modificare             |
-| 8     | Uninit     | Declarație fără inițializare                    |
-| 9-11  | If-Else    | Structuri condiționale                          |
-| 12-14 | While      | Bucle                                           |
-| 15-16 | Return     | Terminare execuție                              |
-| 17-18 | String     | Concatenare                                     |
-| 19-22 | Complexe   | Programe complete                               |
-| 23    | Comentarii | Ignorare comentarii                             |
-| 24    | Blocuri    | Blocuri imbricate                               |
-
----
-
-
-___TEST_ALL___
-
-// EVALUARE COMPLETA - Toate functionalitatile interpretorului
-
-// === 1. LITERALI ===
-let lit_int = 42;
-let lit_float = 3.14;
-let lit_bool_t = true;
-let lit_bool_f = false;
-let lit_char = 'A';
-let lit_string = "Salut";
-
-// === 2. OPERATII ARITMETICE ===
-let arit_add = 15 + 7;
-let arit_sub = 20 - 8;
-let arit_mul = 6 * 7;
-let arit_div = 100 / 4;
-let arit_mod = 17 % 5;
-let arit_float = 3.5 + 2.5;
-
-// === 3. COMPARATII ===
-let cmp_lt = 5 < 10;
-let cmp_le = 5 <= 5;
-let cmp_gt = 10 > 5;
-let cmp_ge = 7 >= 8;
-let cmp_eq = 3 == 3;
-let cmp_neq = 3 != 4;
-
-// === 4. OPERATII LOGICE ===
-let log_and = true && false;
-let log_or = true || false;
-let log_not = !true;
-
-// === 5. OPERATORI UNARI ===
-let un_neg = -42;
-let un_neg_expr = -(10 + 5);
-
-// === 6. PRECEDENTA ===
-let prec1 = 2 + 3 * 4;
-let prec2 = (2 + 3) * 4;
-
-// === 7. VARIABILE ===
-let var_x = 10;
-let var_y = var_x;
-let var_z = var_x + var_y;
-
-// === 8. ATRIBUIRE CA EXPRESIE ===
-let asg_a = 5;
-let asg_b = asg_a = 10;
-
-// === 9. FARA INITIALIZARE ===
-let uninit;
-
-// === 10. IF-ELSE TRUE ===
-let if_t = 0;
-if (5 > 3) {
-    if_t = 1;
-} else {
-    if_t = 2;
+## EXTRA 1: Funcții
+```javascript
+function add(a, b) {
+    return a + b;
 }
-
-// === 11. IF-ELSE FALSE ===
-let if_f = 0;
-if (5 < 3) {
-    if_f = 1;
-} else {
-    if_f = 2;
-}
-
-// === 12. WHILE SIMPLU ===
-let w_i = 0;
-let w_sum = 0;
-while (w_i < 5) {
-    w_sum = w_sum + w_i;
-    w_i = w_i + 1;
-}
-
-// === 13. WHILE CONDITIE FALSA ===
-let w_skip = 100;
-while (w_skip < 0) {
-    w_skip = 999;
-}
-
-// === 14. CONCATENARE STRING ===
-let s1 = "Hello";
-let s2 = " World";
-let s_concat = s1 + s2;
-let s_int = "Val: " + 42;
-
-// === 15. FACTORIAL ===
-let fact_n = 5;
-let fact_result = 1;
-while (fact_n > 0) {
-    fact_result = fact_result * fact_n;
-    fact_n = fact_n - 1;
-}
-
-// === 16. PARE/IMPARE ===
-let pi_i = 1;
-let pi_even = 0;
-let pi_odd = 0;
-while (pi_i <= 10) {
-    if (pi_i % 2 == 0) {
-        pi_even = pi_even + pi_i;
-    } else {
-        pi_odd = pi_odd + pi_i;
-    }
-    pi_i = pi_i + 1;
-}
-
-// === FINAL ===
-// Toate variabilele sunt afisate in starea finala
-
-## EXTRA 
-## 1. Domenii de vizibilitate
 
 let x = 10;
+let y = add(x, 5);
+return y;
+```
+
+**Rezultat așteptat:**
+```
+RETURN (a + b);
+LET x = 10;
+LET y = add(x, 5);
+RETURN y;
+Parserul a construit arborele perfect!
+
+=== EXECUȚIE ===
+
+Program terminat cu return:  15
+```
+
+## EXTRA 2: Domenii de vizibilitate
+
+```javascript
+let global = 100;
+let modificata = 10;
+let shadowed = "original";
+
 {
-    let y = 20;
-    x = x + y;
-    print(x);  // Ar trebui să fie 30
+    let local_exterior = 50;
+    
+    modificata = modificata + local_exterior;
+    
+    let shadowed = "in bloc";
+    
+    {
+        let local_interior = 25;
+        
+        global = global + local_interior;
+    }
 }
-return y; // Aici ar trebui sa dea eroare
-return x;
+```
+
+**Rezultat așteptat:**
+```
+[OK] Program executat cu succes.
+Starea finală a variabilelor:
+  global = 125
+  modificata = 60
+  shadowed = "original"
+```
+---
+

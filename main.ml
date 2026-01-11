@@ -12,29 +12,29 @@ let () =
     
     print_endline "=== AST ===";
     Ast.print_ast "" ast;
-    print_endline "✅ Parserul a construit arborele perfect!";
+    print_endline "[OK] Parserul a construit arborele.";
     
     print_endline "\n=== EXECUȚIE ===";
     Eval.run ast
     
   with
   | Lexer.SyntaxError msg ->
-      Printf.printf "❌ Eroare Lexicala: %s\n" msg;
+      Printf.printf "[EROARE] Eroare Lexicala: %s\n" msg;
       close_in chan
   | Parser.Error ->
       (let pos = lexbuf.Lexing.lex_curr_p in
-      Printf.printf "❌ Eroare de Sintaxa la linia %d, coloana %d (langa jetonul '%s')\n" 
+      Printf.printf "[EROARE] Eroare de Sintaxa la linia %d, coloana %d (langa jetonul '%s')\n" 
         pos.pos_lnum (pos.pos_cnum - pos.pos_bol) (Lexing.lexeme lexbuf);
       close_in chan)
   | Eval.RuntimeError msg ->
-      Printf.printf "❌ RuntimeError: %s\n" msg;
+      Printf.printf "[EROARE] RuntimeError: %s\n" msg;
       close_in chan
   | Eval.UndefinedVariable msg ->
-      Printf.printf "❌ UndefinedVariable: %s\n" msg;
+      Printf.printf "[EROARE] UndefinedVariable: %s\n" msg;
       close_in chan
   | Eval.TypeError msg ->
-      Printf.printf "❌ TypeError: %s\n" msg;
+      Printf.printf "[EROARE] TypeError: %s\n" msg;
       close_in chan
   | e ->
-      Printf.printf "❌ Eroare neasteptata: %s\n" (Printexc.to_string e);
+      Printf.printf "[EROARE] Eroare neasteptata: %s\n" (Printexc.to_string e);
       close_in chan

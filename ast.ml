@@ -18,8 +18,7 @@ type expr =
     | Call of string * expr list          
     | FuncExpr of string list * stmt   
 
-
-type stmt =
+and stmt =
     | Skip
     | Declare of string * expr option
     | Expr of expr
@@ -55,7 +54,10 @@ let rec string_of_expr = function
   | UnOp (Not, e) -> "!(" ^ string_of_expr e ^ ")"
 
 let rec print_ast indent = function
-  | Block ss -> List.iter (print_ast indent) ss
+  | Block ss -> 
+      Printf.printf "%s{\n" indent;
+      List.iter (print_ast (indent ^ "  ")) ss;
+      Printf.printf "%s}\n" indent
   | Declare (x, None) -> Printf.printf "%sLET %s;\n" indent x
   | Declare (x, Some e) -> Printf.printf "%sLET %s = %s;\n" indent x (string_of_expr e)
   | If (c, s1, s2) -> 

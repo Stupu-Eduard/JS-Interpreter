@@ -1,5 +1,8 @@
 open Ast
 
+(* === ENVIRONMENT (starea programului) === *)
+module EnvMap = Map.Make(String)
+
 (* === TIPURI PENTRU VALORI === *)
 type value =
   | VInt of int
@@ -10,9 +13,35 @@ type value =
   | VUndefined
   | VFunc of string list * stmt * env
 
-(* === ENVIRONMENT (starea programului) === *)
-module Env = Map.Make(String)
-type env = value Env.t
+(* === ENVIRONMENT TYPE === *)
+(* Păstrăm atât map-ul cât și ordinea declarării *)
+and env = {
+  values: value EnvMap.t;
+  order: string list;  (* Lista cheilor în ordinea declarării *)
+}
+
+(* Helper functions pentru env *)
+let env_empty = { values = EnvMap.empty; order = [] }
+
+let env_add key value env =
+  if EnvMap.mem key env.values then
+    (* Variabila există deja, doar actualizăm valoarea *)
+    { env with values = EnvMap.add key value env.values }
+  else
+    (* Variabilă nouă, adăugăm și în order *)
+    { values = EnvMap.add key value env.values; order = env.order @ [key] }
+
+let env_find key env = EnvMap.find key env.values
+let env_find_opt key env = EnvMap.find_opt key env.values
+let env_mem key env = EnvMap.mem key env.values
+
+(* Iterează în ordinea declarării *)
+let env_iter_ordered f env =
+  List.iter (fun key ->
+    match EnvMap.find_opt key env.values with
+    | Some v -> f key v
+    | None -> ()
+  ) env.order
 
 (* === REZULTATUL EXECUȚIEI === *)
 type result =
@@ -59,23 +88,23 @@ let rec eval_expr (env : env) (e : expr) : value * env =
   
   (* Variabile *)
   | Var x ->
-      (try (Env.find x env, env)
+      (try (env_find x env, env)
        with Not_found -> raise (UndefinedVariable ("Variabila '" ^ x ^ "' nu este definită")))
   
   (* Atribuire (expresie!) *)
   | Assign (x, e1) ->
       let (v, env') = eval_expr env e1 in
       (* Verifică dacă variabila există *)
-      if not (Env.mem x env') then
+      if not (env_mem x env') then
         raise (UndefinedVariable ("Variabila '" ^ x ^ "' nu este declarată"))
       else
-        (v, Env.add x v env')  (* returnează valoarea ȘI actualizează env *)
+        (v, env_add x v env')  (* returnează valoarea ȘI actualizează env *)
 
   (* Apel funcție *)
   | Call (fname, args) ->
       let (evaluated_args, env_after_args) = eval_args env args in
       let func_val =
-        try Env.find fname env_after_args
+        try env_find fname env_after_args
         with Not_found -> raise (UndefinedVariable ("Funcția '" ^ fname ^ "' nu este definită"))
       in
       (match func_val with
@@ -83,8 +112,10 @@ let rec eval_expr (env : env) (e : expr) : value * env =
            if List.length params <> List.length evaluated_args then
              raise (RuntimeError "Număr de argumente incorect la apelul funcției")
            else
+             (* Adaugam functia in call_env pentru a suporta recursivitatea *)
+             let call_env_with_func = env_add fname func_val closure_env in
              let call_env =
-               List.fold_left2 (fun acc param arg -> Env.add param arg acc) closure_env params evaluated_args
+               List.fold_left2 (fun acc param arg -> env_add param arg acc) call_env_with_func params evaluated_args
              in
              (match exec_stmt call_env body with
               | Exit (ret, _) -> (ret, env_after_args)
@@ -192,7 +223,7 @@ and eval_args env args =
 (* === EXECUȚIA INSTRUCȚIUNILOR === *)
 (* Returnează result:  Continue env | Exit (value, env) *)
 
-let rec exec_stmt (env :  env) (s : stmt) : result =
+and exec_stmt (env :  env) (s : stmt) : result =
   match s with
   (* Skip - nu face nimic *)
   | Skip -> Continue env
@@ -203,7 +234,7 @@ let rec exec_stmt (env :  env) (s : stmt) : result =
         | Some e -> eval_expr env e
         | None -> (VUndefined, env)
       in
-      Continue (Env.add x v env')
+      Continue (env_add x v env')
   
   (* Expresie ca statement (ex:  x = 5;) *)
   | Expr e ->
@@ -217,7 +248,7 @@ let rec exec_stmt (env :  env) (s : stmt) : result =
     (* Declarație funcție *)
     | FuncDecl (name, params, body) ->
       let func_val = VFunc (params, body, env) in
-      Continue (Env.add name func_val env)
+      Continue (env_add name func_val env)
   
   (* If-Else *)
   | If (cond, s1, s2) ->
@@ -237,22 +268,45 @@ let rec exec_stmt (env :  env) (s : stmt) : result =
       Exit (v, env')
 
 (* Execută un bloc de instrucțiuni cu Scoping *)
-and exec_block env stmts =
-  let rec loop current_env = function
+(* NOTĂ: Pentru blocuri { } explicite, variabilele locale sunt eliminate la final *)
+(* Pentru blocul top-level (programul principal), vrem să păstrăm toate variabilele *)
+and exec_block ?(is_toplevel=false) env stmts =
+  (* Ținem evidența variabilelor DECLARATE (nu doar modificate) în acest bloc *)
+  let rec loop current_env declared_in_block = function
     | [] -> 
-        let env_dupa_bloc = Env.fold (fun cheie valoare acc ->
-          if Env.mem cheie env then 
-            Env.add cheie valoare acc 
-          else 
-            acc
-        ) current_env env in
-        Continue env_dupa_bloc
+        if is_toplevel then
+          (* Pentru top-level, păstrăm toate variabilele *)
+          Continue current_env
+        else
+          (* Pentru blocuri locale:
+             - Eliminăm variabilele declarate în bloc
+             - Restaurăm valorile originale pentru variabilele care au fost shadowed
+             - Păstrăm modificările pentru variabilele exterioare care au fost doar atribuite *)
+          let env_dupa_bloc = List.fold_left (fun acc cheie ->
+            let valoare_originala = env_find cheie env in
+            if List.mem cheie declared_in_block then
+              (* Variabila a fost declarată în bloc - folosim valoarea originală *)
+              env_add cheie valoare_originala acc
+            else
+              (* Variabila nu a fost re-declarată - folosim valoarea curentă *)
+              match env_find_opt cheie current_env with
+              | Some v -> env_add cheie v acc
+              | None -> env_add cheie valoare_originala acc
+          ) env_empty env.order in
+          Continue env_dupa_bloc
         
     | s :: rest ->
-        (match exec_stmt current_env s with
-         | Continue env' -> loop env' rest
-         | Exit (v, env') -> Exit (v, env'))
-  in loop env stmts
+        (match s with
+         | Declare (name, _) when env_mem name env ->
+             (* Variabila exista deja - este shadowing, o adăugăm la lista *)
+             (match exec_stmt current_env s with
+              | Continue env' -> loop env' (name :: declared_in_block) rest
+              | Exit (v, env') -> Exit (v, env'))
+         | _ ->
+             (match exec_stmt current_env s with
+              | Continue env' -> loop env' declared_in_block rest
+              | Exit (v, env') -> Exit (v, env')))
+  in loop env [] stmts
 
 and exec_while env cond body =
   let (v, env') = eval_expr env cond in
@@ -266,18 +320,23 @@ and exec_while env cond body =
 (* === FUNCȚIA PRINCIPALĂ === *)
 
 let run (program : stmt) : unit =
-  let empty_env = Env.empty in
+  let empty_env = env_empty in
   try
-    match exec_stmt empty_env program with
+    (* Pentru programul principal (Block top-level), folosim is_toplevel=true *)
+    let result = match program with
+      | Block stmts -> exec_block ~is_toplevel:true empty_env stmts
+      | _ -> exec_stmt empty_env program
+    in
+    match result with
     | Continue final_env ->
-        print_endline "\n✅ Program executat cu succes. ";
+        print_endline "\n[OK] Program executat cu succes.";
         print_endline "Starea finală a variabilelor:";
-        Env.iter (fun k v -> 
+        env_iter_ordered (fun k v -> 
           Printf.printf "  %s = %s\n" k (string_of_value v)
         ) final_env
     | Exit (v, _) ->
-        Printf.printf "\n✅ Program terminat cu return:  %s\n" (string_of_value v)
+        Printf.printf "\n[OK] Program terminat cu return: %s\n" (string_of_value v)
   with
-  | RuntimeError msg -> Printf.printf "❌ RuntimeError: %s\n" msg
-  | UndefinedVariable msg -> Printf.printf "❌ UndefinedVariable: %s\n" msg
-  | TypeError msg -> Printf.printf "❌ TypeError:  %s\n" msg
+  | RuntimeError msg -> Printf.printf "[EROARE] RuntimeError: %s\n" msg
+  | UndefinedVariable msg -> Printf.printf "[EROARE] UndefinedVariable: %s\n" msg
+  | TypeError msg -> Printf.printf "[EROARE] TypeError: %s\n" msg
