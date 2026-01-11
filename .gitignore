@@ -1,6 +1,37 @@
 *.cmi
 *.cmo
+*.cmx
+*.o
+*.byte
+*.native
+*.exe
+*.log
+*.aux
+*.out
+*.pdf
+*.toc
+*.dvi
+*.ps
+*.tar
+*.zip
+*.tar.gz
+*.tar.bz2
+*.swp
+*~
+.parser.ml
 parser.ml
 parser.mli
 lexer.ml
 interpretor
+/build/
+/_dist/
+/node_modules/
+
+# OCamlbuild and dune artifacts
+_build/
+*.install
+
+# VSCode, Jetbrains and OS files
+.vscode/
+.idea/
+.DS_Store
