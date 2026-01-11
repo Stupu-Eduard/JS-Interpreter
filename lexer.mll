@@ -10,6 +10,7 @@ let whitespace = [' ' '\t' '\r' '\n']+
 rule read = parse
   | whitespace { read lexbuf }
   | "//" [^ '\n']* { read lexbuf } (* REGULA NOUA: Ignora comentariile pe o singura linie *)
+  | "function" { FUNCTION }
   | "let"   { LET }
   | "return" { RETURN }
   | "if"    { IF }
@@ -32,6 +33,7 @@ rule read = parse
   | '<'     { LT }
   | '>'     { GT }
   | '!'     { NOT }
+  | ','     { COMMA }
   | ';'     { SEMICOLON }
   | '{'     { LBRACE }
   | '}'     { RBRACE }
@@ -44,4 +46,3 @@ rule read = parse
   | '"' ([^ '"']* as s) '"' { STRING s }
   | eof     { EOF }
   | _       { raise (SyntaxError ("Unexpected char: " ^ Lexing.lexeme lexbuf)) }
-  | "function" { FUNCTION }

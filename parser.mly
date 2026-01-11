@@ -7,10 +7,10 @@
 %token <char> CHAR
 %token <string> STRING
 %token <string> ID
-%token LET IF ELSE WHILE TRUE FALSE
+%token LET IF ELSE WHILE TRUE FALSE FUNCTION
 %token PLUS MINUS TIMES DIVIDE MOD
 %token EQ NEQ LT LE GT GE AND OR NOT ASSIGN
-%token LPAREN RPAREN LBRACE RBRACE SEMICOLON
+%token LPAREN RPAREN LBRACE RBRACE SEMICOLON COMMA
 %token EOF
 
 /* PRIORITATI: De la mic la mare */
@@ -58,9 +58,28 @@ expr:
   | MINUS; e = expr %prec UNARY_MINUS { UnOp(Neg, e) }
   | NOT; e = expr { UnOp(Not, e) }
   | LPAREN; e = expr; RPAREN { e }
+  | f = ID; LPAREN; args = args_opt; RPAREN { Call(f, args) }
+  | FUNCTION; LPAREN; params = params_opt; RPAREN; body = stmt { FuncExpr(params, body) }
   ;
 
+args_opt:
+  |                        { [] }
+  | first = expr; rest = args_tail { first :: rest }
+
+args_tail:
+  |                        { [] }
+  | COMMA; e = expr; rest = args_tail { e :: rest }
+
+params_opt:
+  |                        { [] }
+  | first = ID; rest = params_tail { first :: rest }
+
+params_tail:
+  |                        { [] }
+  | COMMA; p = ID; rest = params_tail { p :: rest }
+
 stmt:
+  | FUNCTION; name = ID; LPAREN; params = params_opt; RPAREN; body = stmt { FuncDecl(name, params, body) }
   | RETURN; e = expr; SEMICOLON { Return e }
   | LET; x = ID; ASSIGN; e = expr; SEMICOLON { Declare(x, Some e) }
   | LET; x = ID; SEMICOLON { Declare(x, None) }

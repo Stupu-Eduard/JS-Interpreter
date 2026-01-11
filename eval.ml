@@ -34,6 +34,7 @@ let string_of_value = function
   | VChar c -> String.make 1 c
   | VString s -> "\"" ^ s ^ "\""
   | VUndefined -> "undefined"
+  | VFunc _ -> "<function>"
 
 (* Verifică dacă o valoare e "truthy" (pentru if/while) *)
 let is_truthy = function
@@ -69,6 +70,29 @@ let rec eval_expr (env : env) (e : expr) : value * env =
         raise (UndefinedVariable ("Variabila '" ^ x ^ "' nu este declarată"))
       else
         (v, Env.add x v env')  (* returnează valoarea ȘI actualizează env *)
+
+  (* Apel funcție *)
+  | Call (fname, args) ->
+      let (evaluated_args, env_after_args) = eval_args env args in
+      let func_val =
+        try Env.find fname env_after_args
+        with Not_found -> raise (UndefinedVariable ("Funcția '" ^ fname ^ "' nu este definită"))
+      in
+      (match func_val with
+       | VFunc (params, body, closure_env) ->
+           if List.length params <> List.length evaluated_args then
+             raise (RuntimeError "Număr de argumente incorect la apelul funcției")
+           else
+             let call_env =
+               List.fold_left2 (fun acc param arg -> Env.add param arg acc) closure_env params evaluated_args
+             in
+             (match exec_stmt call_env body with
+              | Exit (ret, _) -> (ret, env_after_args)
+              | Continue _ -> (VUndefined, env_after_args))
+       | _ -> raise (TypeError ("Valoarea '" ^ fname ^ "' nu este apelabilă")))
+
+  (* Expresie funcție (funcție anonimă) *)
+  | FuncExpr (params, body) -> (VFunc (params, body, env), env)
   
   (* Operații binare *)
   | BinOp (e1, op, e2) ->
@@ -156,6 +180,15 @@ and eval_unop op v =
   | (Not, v) -> VBool (not (is_truthy v))  (* !  pe non-bool folosește truthy *)
   | _ -> raise (TypeError "Operație unară invalidă")
 
+and eval_args env args =
+  let rec aux acc current_env = function
+    | [] -> (List.rev acc, current_env)
+    | a :: rest ->
+        let (v, env') = eval_expr current_env a in
+        aux (v :: acc) env' rest
+  in
+  aux [] env args
+
 (* === EXECUȚIA INSTRUCȚIUNILOR === *)
 (* Returnează result:  Continue env | Exit (value, env) *)
 
@@ -180,6 +213,11 @@ let rec exec_stmt (env :  env) (s : stmt) : result =
   (* Bloc de instrucțiuni *)
   | Block stmts ->
       exec_block env stmts
+
+    (* Declarație funcție *)
+    | FuncDecl (name, params, body) ->
+      let func_val = VFunc (params, body, env) in
+      Continue (Env.add name func_val env)
   
   (* If-Else *)
   | If (cond, s1, s2) ->

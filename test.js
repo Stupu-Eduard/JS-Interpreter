@@ -1,7 +1,7 @@
-let x = 10;
-{
-    let y = 20;
-    x = x + y; 
+function add(a, b) {
+    return a + b;
 }
-return y;  // Eroare: y nu este definit în acest scope
-return x;
+
+let x = 10;
+let y = add(x, 5);
+return y;

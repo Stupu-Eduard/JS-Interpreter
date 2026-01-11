@@ -39,6 +39,12 @@ let rec string_of_expr = function
   | Char c -> "'" ^ String.make 1 c ^ "'"
   | Var x -> x
   | Assign (x, e) -> "(" ^ x ^ " = " ^ (string_of_expr e) ^ ")" (* Mutat aici! *)
+  | Call (f, args) ->
+      let rendered_args = String.concat ", " (List.map string_of_expr args) in
+      f ^ "(" ^ rendered_args ^ ")"
+  | FuncExpr (params, _) ->
+      let rendered_params = String.concat ", " params in
+      "function(" ^ rendered_params ^ ") { ... }"
   | BinOp (e1, op, e2) ->
       let op_s = match op with
         | Add -> "+" | Sub -> "-" | Mul -> "*" | Div -> "/" | Mod -> "%"
@@ -63,3 +69,7 @@ let rec print_ast indent = function
   | Expr e -> Printf.printf "%s%s;\n" indent (string_of_expr e) (* Acum Assign va fi printat prin Expr *)
   | Skip -> Printf.printf "%sSKIP;\n" indent
   | Return e -> Printf.printf "%sRETURN %s;\n" indent (string_of_expr e)
+  | FuncDecl (name, params, body) ->
+      let rendered_params = String.concat ", " params in
+      Printf.printf "%sFUNCTION %s(%s)\n" indent name rendered_params;
+      print_ast (indent ^ "  ") body
