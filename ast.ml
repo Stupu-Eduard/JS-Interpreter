@@ -15,6 +15,9 @@ type expr =
     | Assign of string * expr  (* Expresie acum! *)
     | BinOp of expr * operator * expr
     | UnOp of uoperator * expr
+    | Call of string * expr list          
+    | FuncExpr of string list * stmt   
+
 
 type stmt =
     | Skip
@@ -24,6 +27,8 @@ type stmt =
     | If of expr * stmt * stmt
     | While of expr * stmt
     | Return of expr 
+    | FuncDecl of string * string list * stmt
+    
 (* --- Functii de afisare (pentru Debug) --- *)
 
 let rec string_of_expr = function

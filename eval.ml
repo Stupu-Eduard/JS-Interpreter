@@ -8,6 +8,7 @@ type value =
   | VChar of char
   | VString of string
   | VUndefined
+  | VFunc of string list * stmt * env
 
 (* === ENVIRONMENT (starea programului) === *)
 module Env = Map.Make(String)

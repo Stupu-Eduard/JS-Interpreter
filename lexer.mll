@@ -44,3 +44,4 @@ rule read = parse
   | '"' ([^ '"']* as s) '"' { STRING s }
   | eof     { EOF }
   | _       { raise (SyntaxError ("Unexpected char: " ^ Lexing.lexeme lexbuf)) }
+  | "function" { FUNCTION }
